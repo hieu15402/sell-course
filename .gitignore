@@ -47,3 +47,5 @@ nbproject/
 
 # Spring Boot specific (exclude the generated .mvn directory if using Maven)
 .mvn/
+
+HELP.md
