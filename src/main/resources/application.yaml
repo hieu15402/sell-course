@@ -2,7 +2,7 @@ spring:
   application:
     name: sell-course
   datasource:
-    url: jdbc:postgresql://localhost:5432/sell-course
+    url: jdbc:postgresql://db:5432/sell-course
     username: ${DB_USERNAME:postgres}
     password: ${DB_PASSWORD:12345}
     driver-class-name: org.postgresql.Driver
@@ -16,6 +16,7 @@ spring:
         format_sql: true
         id:
           new_generator_mappings: false
+    open-in-view: false
   servlet:
     multipart:
       enabled: true
@@ -24,7 +25,7 @@ spring:
   data:
     redis:
       database: 0
-      host: localhost
+      host: redis-v1
       port: 6379
       timeout: 60000
       password: 123456
@@ -40,7 +41,7 @@ spring:
           starttls:
             enable: true
   kafka:
-    bootstrap-servers: localhost:9092
+    bootstrap-servers: kafka-v1:9092
     consumer:
       group-id: my-consumer-group
       auto-offset-reset: earliest
@@ -52,7 +53,7 @@ jwt:
   valid-duration: 2
   refreshable-duration: 7
 server:
-  port: 8080
+  port: 8081
 cloudinary:
   cloud-name: "dksz6cw9r"
   api-key: "855524113383431"

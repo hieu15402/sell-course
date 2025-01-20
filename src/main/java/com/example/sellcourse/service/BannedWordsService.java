@@ -6,11 +6,14 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 import com.hankcs.algorithm.AhoCorasickDoubleArrayTrie;
 
+import java.io.BufferedReader;
 import java.io.IOException;
-import java.nio.file.Files;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -25,13 +28,16 @@ public class BannedWordsService {
     @PostConstruct
     public void loadBannedWords() {
         try {
-            ClassPathResource resource = new ClassPathResource("banned_words.txt");
-            List<String> bannedWordsList = Files.readAllLines(resource.getFile().toPath());
+            Resource resource = new ClassPathResource("banned_words.txt");
+            InputStream inputStream = resource.getInputStream();
+            BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
 
+            List<String> bannedWordsList = reader.lines().toList();
             Map<String, String> map = new HashMap<>();
             for (String word : bannedWordsList) {
                 map.put(word.toLowerCase(), word);
             }
+
             ahoCorasickTrie.build(map);
 
         } catch (IOException e) {

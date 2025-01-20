@@ -1,0 +1,81 @@
+version: '3.8'
+
+services:
+  # Container cho ứng dụng Spring Boot
+  sell-course:
+    build: .
+    ports:
+      - "8081:8081"  # Map cổng container tới cổng máy chủ
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/sell-course
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=12345
+      - SPRING_JPA_HIBERNATE_DDL-AUTO=update
+      - SPRING_REDIS_HOST=redis
+      - SPRING_REDIS_PORT=6379
+      - SPRING_KAFKA_BOOTSTRAP-SERVERS=kafka:9092
+      - SPRING_KAFKA_CONSUMER_GROUP-ID=my-consumer-group
+      - SPRING_KAFKA_CONSUMER_AUTO-OFFSET-RESET=earliest
+      - SPRING_KAFKA_PRODUCER_KEY-SERIALIZER=org.apache.kafka.common.serialization.StringSerializer
+      - SPRING_KAFKA_PRODUCER_VALUE-SERIALIZER=org.springframework.kafka.support.serializer.JsonSerializer
+      - JWT_SIGNER_KEY=ND3qj84pmAajX15lYhfKNVCxtmYdf5bg
+      - JWT_VALID_DURATION=2
+      - JWT_REFRESHABLE_DURATION=7
+      - CLOUDINARY_CLOUD_NAME=dksz6cw9r
+      - CLOUDINARY_API_KEY=855524113383431
+      - CLOUDINARY_API_SECRET=94t2_RVAMLHRamLqLYejjm6kSl0
+    depends_on:
+      - db  # Chờ PostgreSQL sẵn sàng
+      - kafka  # Chờ Kafka sẵn sàng
+      - redis  # Chờ Redis sẵn sàng
+
+  # Container cho PostgreSQL
+  db:
+    image: postgres:latest  # Dùng image PostgreSQL chính thức
+    environment:
+      POSTGRES_DB: sell-course
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 12345
+    ports:
+      - "5432:5432"  # Map cổng container PostgreSQL đến máy chủ
+    volumes:
+      - postgres-data:/var/lib/postgresql/data  # Lưu dữ liệu của PostgreSQL
+
+  # Container cho Redis
+  redis:
+    image: redis:latest  # Dùng image Redis chính thức
+    container_name: redis-v1
+    ports:
+      - "6379:6379"  # Map cổng container Redis đến máy chủ
+
+  # Container cho Zookeeper
+  zookeeper:
+    image: confluentinc/cp-zookeeper:latest
+    container_name: zookeeper-v1
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+
+  # Container cho Kafka
+  kafka:
+    image: confluentinc/cp-kafka:latest
+    container_name: kafka-v1
+    depends_on:
+      - zookeeper
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+      KAFKA_LISTENER_PORT: 9092
+      KAFKA_LISTENER_NAME_INTERNAL: INSIDE
+      KAFKA_LISTENER_NAME_EXTERNAL: OUTSIDE
+      KAFKA_LISTENER_INTER_BROKER: INTERNAL
+      KAFKA_LISTENER_SECURITY_PROTOCOL: PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+    ports:
+      - "9092:9092"  # Map cổng container Kafka đến máy chủ
+
+# Volume để lưu dữ liệu PostgreSQL
+volumes:
+  postgres-data:

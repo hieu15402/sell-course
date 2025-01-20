@@ -35,7 +35,7 @@ public class SwaggerConfig {
                 )
                 .addSecurityItem(new SecurityRequirement().addList("bearerAuth"))
                 .servers(List.of(
-                        new Server().url("http://localhost:8080").description("Local Server")
+                        new Server().url("http://localhost:8081").description("Local Server")
                 ));
     }
 }
